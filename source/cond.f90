@@ -14,7 +14,7 @@ program cond
     dt=0.001 !tamnaho do dt
     w=k
     write(20,*) w
-    do while (t<20)
+    do
         do while(i/=n) !enquanto i for menor que n:
             w(i)=((dt*a*(k(i+1)-2*(k(i))+k(i-1)))/dx**2)+k(i) ! o vetor w é igua a isso tudo que envolve o vetor k
             i=i+1             
