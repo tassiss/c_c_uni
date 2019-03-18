@@ -1,0 +1,8 @@
+2.0         !tamanho da barra
+10          !número de nós na barra
+200.0       !temperatura inserida no inicio da barra
+100.0       ! temperatura no restante da barra
+1.0         ! difusidade térmica
+1.0E-14     !tolerância 
+0.001      !passo de tempo
+3.0         !tempo de simulação
