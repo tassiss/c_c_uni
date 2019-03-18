@@ -9,3 +9,4 @@ test: all
 	valgrind --leak-check=full --show-reachable=yes --track-origins=yes ./cond
 clean:
 	rm -rf  cond *.*
+

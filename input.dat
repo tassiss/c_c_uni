@@ -6,3 +6,4 @@
 1.0E-14     !tolerância 
 0.001      !passo de tempo
 3.0         !tempo de simulação
+500	    !passos para print

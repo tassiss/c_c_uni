@@ -2,9 +2,9 @@ module conducao
 implicit none
 
 contains
-subroutine ent_cond(l,n,t_i,t_l,a,tol,dt,t, k, w, phi, dx)
+subroutine ent_cond(l,n,t_i,t_l,a,tol,dt,t, k, w, phi, dx, show)
     implicit none
-    integer::n, status=0, input_id=21, cont=1
+    integer::n, status=0, input_id=21, cont=1, show
     double precision, allocatable, dimension(:):: k, w, phi
     double precision:: l, t_i, t_l, t, dt, dx, tol, a, in
     open(unit=input_id, action='read', status='old', iostat=status, file='../input.dat')!chamada dos dados de entrada
@@ -29,6 +29,8 @@ subroutine ent_cond(l,n,t_i,t_l,a,tol,dt,t, k, w, phi, dx)
             dt=in               !passo de tempo
         else if(cont==8) then
             t=in                !tempo final
+        else if (cont==9) then
+            show=nint(in)       !número de iterações para salvar arquivo para python
         end if
         cont=cont+1            !linha do arquivo
     end do
@@ -43,12 +45,15 @@ subroutine ent_cond(l,n,t_i,t_l,a,tol,dt,t, k, w, phi, dx)
     phi=t_l
     phi(1)=t_i
 end subroutine 
-subroutine calc_cond (l,n,t_i,t_l,a,tol,dt,t, k, w, phi, dx, fid, d, i)
+subroutine calc_cond (l,n,t_i,t_l,a,tol,dt,t, k, w, phi, dx, fid, d, i, show)
 implicit none
-integer::n, fid,i
+integer::n, fid,i, show, cont=1, j=1, status=0
 double precision, allocatable,dimension(:)::w,k,dif,phi
 double precision:: d,x,dx, tol, t, dt, l, a, t_l, t_i
+character(len=2048)::file, name,out
+out='../output/'
 x=dx
+
     do
         do while(i/=n) !enquanto i for menor que n:
             w(i)=((dt*a*(k(i+1)-2*(k(i))+k(i-1)))/dx**2)+k(i) ! o vetor w é igua a isso tudo que envolve o vetor k
@@ -57,12 +62,25 @@ x=dx
         i=2
         dif=w-k !vetor diferença
         d=sum(dif) !soma dos elementos do vetor diferença
-        if(d<tol)then !se a soma foir igual a zero, quero dizer que a peóxima linha i é igual a linha i-1
-            exit !encerra o loop e mostra o tempo necessario para estabilizar
-        end if
         k=w ! k igual w diz que na próxima entrada os valores de k serão iguais os valores calculados para w nessa saída
         write(fid,*)w
         t=t+dt
+        if(mod(cont,show)==0 .or. d<tol .or. cont==1)then
+            write(file,'(I5)') cont
+            name=trim(out)//trim(file)//'.dat'
+            open(unit=22, file=trim(name), action='write', status='unknown', iostat=status)
+            do while (j-1/=n)
+                write(22,*)t, w(j)
+                j=j+1
+            end do
+            j=1
+            close(22, iostat=status)
+        end if
+        
+        if(d<tol)then !se a soma foir igual a zero, quero dizer que a peóxima linha i é igual a linha i-1
+            exit !encerra o loop e mostra o tempo necessario para estabilizar
+        end if
+        cont=cont+1
     end do
     do while (i/=n)
         phi(i)=a*((((t_l-t_i)/l)*x)+t_i) !resolução do modelo matemático
