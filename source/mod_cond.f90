@@ -37,58 +37,79 @@ subroutine ent_cond(l,n,t_i,t_l,a,tol,dt,t, k, w, phi, dx, show)
     close(input_id)
     allocate(k(n),stat=status)
     allocate(w(n), stat=status)
-    allocate(phi(n), stat=status)
     k=t_l
     k(1)=t_i
-    dx=l/(n-1)
+    dx=l/(real(n-1))
     w=k
     phi=t_l
     phi(1)=t_i
 end subroutine 
-subroutine calc_cond (l,n,t_i,t_l,a,tol,dt,t, k, w, phi, dx, fid, d, i, show)
+subroutine calc_cond (n,t_i,t_l,a,tol,dt,t, k, w, dx, fid, d, i, show)
 implicit none
-integer::n, fid,i, show, cont=1, j=1, status=0
-double precision, allocatable,dimension(:)::w,k,dif,phi
-double precision:: d,x,dx, tol, t, dt, l, a, t_l, t_i
-character(len=2048)::file, name,out
-out='../output/'
-x=dx
-
+integer::n, fid,i, show, j=1, status=0, cont=1
+!integer*16:: cont=1
+double precision, allocatable,dimension(:)::w,k,dif
+double precision:: d,x,dx, tol, t, dt, a, t_l, t_i
+character*2048::file, name,out
+    out='../output/'
+    write(file,'(I5)') cont !tranforma cont em character
+    name=trim(out)//trim(adjustl(file))//'.dat' !cria o nome do arquivo
+    open(unit=22, file=Trim((name)), action='write', status='unknown', iostat=status) !abre o arquivo
+    x=0.00000
+    do while (j<=n)!varre todo o vetor, inclusive as pontas
+    write(22,*)t, x, w(j) !escreve tempo, posição do nó e sua respectiva temperatura
+    w(j)=t_l
+    w(1)=t_i
+    j=j+1
+    x=x+dx
+    end do
+    j=1
+    close(22, iostat=status)
     do
         do while(i/=n) !enquanto i for menor que n:
-            w(i)=((dt*a*(k(i+1)-2*(k(i))+k(i-1)))/dx**2)+k(i) ! o vetor w é igua a isso tudo que envolve o vetor k
+            w(i)=((dt*a*(k(i+1)-(2*(k(i)))+k(i-1)))/dx**2)+k(i) ! o vetor w é igua a isso tudo que envolve o vetor k
             i=i+1             
         end do
         i=2
         dif=w-k !vetor diferença
-        d=sum(dif) !soma dos elementos do vetor diferença
+        d=(sum(dif))/n !soma dos elementos do vetor diferença
         k=w ! k igual w diz que na próxima entrada os valores de k serão iguais os valores calculados para w nessa saída
         write(fid,*)w
-        t=t+dt
-        if(mod(cont,show)==0 .or. d<tol .or. cont==1)then
-            write(file,'(I5)') cont
-            name=trim(out)//trim(file)//'.dat'
-            open(unit=22, file=trim(name), action='write', status='unknown', iostat=status)
+        if(mod(cont,show)==0 .or. abs(d)<tol .or. cont==1)then !se o resto da divisão de cont/show for exata, se a diferença entre linhas for menor que a tolerância estabecida & o primeiro calculo
+            write(file,'(I64)') cont
+            name=trim(out)//trim(adjustl(file))//'.dat'
+            open(unit=22, file=(name), action='write', status='unknown', iostat=status)
+            x=0.00000
             do while (j-1/=n)
-                write(22,*)t, w(j)
-                j=j+1
+                write(22,*)t, x, w(j)
+                j=j+1       
+                x=x+dx
             end do
             j=1
             close(22, iostat=status)
         end if
-        
-        if(d<tol)then !se a soma foir igual a zero, quero dizer que a peóxima linha i é igual a linha i-1
+        x=dx
+        if(abs(d)<tol)then !se a soma foir igual a zero, quero dizer que a peóxima linha i é igual a linha i-1
             exit !encerra o loop e mostra o tempo necessario para estabilizar
         end if
         cont=cont+1
+        t=t+dt
     end do
-    do while (i/=n)
-        phi(i)=a*((((t_l-t_i)/l)*x)+t_i) !resolução do modelo matemático
-        i=i+1
+end subroutine
+function analitico (x,dx, n, t_i, t_l, a, l)  result(phi)
+    integer::n, j, status=0
+    double precision:: x
+    double precision, intent(in):: t_i, t_l, a, l, dx
+    double precision, allocatable,dimension(:):: phi
+    allocate(phi(n), stat=status)
+    j=1
+    phi=t_l
+    phi(1)=t_i
+    do while (j-1/=n)
+        phi(j)=a*((((t_l-t_i)/l)*x)+t_i)
+        j=j+1
         x=x+dx
     end do
-    dif=phi-w !diferença entre o modelo matemático e númerico
-    write(*,*) dif
-    deallocate(dif)
-end subroutine
+    write(*,*) phi
+end function
 end module conducao
