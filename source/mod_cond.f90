@@ -2,38 +2,21 @@ module conducao
 implicit none
 
 contains
-subroutine ent_cond(l,n,t_i,t_l,a,tol,dt,t, k, w, phi, dx, show)
+subroutine ent_cond(l,n,t_i,t_l,a,tol,dt,t, k, w, dx, show)
     implicit none
-    integer::n, status=0, input_id=21, cont=1, show
-    double precision, allocatable, dimension(:):: k, w, phi
-    double precision:: l, t_i, t_l, t, dt, dx, tol, a, in
+    integer::n, status=0, input_id=21, show
+    double precision, allocatable, dimension(:):: k, w
+        double precision:: l, t_i, t_l, t, dt, dx, tol, a
     open(unit=input_id, action='read', status='old', iostat=status, file='../input.dat')!chamada dos dados de entrada
-    do
-        read(input_id, *,iostat=status)in
-        if (status/=0)then
-            exit
-        end if
-        if(cont==1)then         !linha 1 
-            l=in                !tamanho da barra
-        else if (cont==2)then   !linha 2
-            n=nint(in)                !número de nós
-        else if (cont==3) then  
-            t_i=in              !temperatura no inicio da barra
-        else if(cont==4) then   
-            t_l=in              !temperatura ao longo da barra
-        else if (cont==5)then
-            a=in                !difusidade térmica
-        else if (cont==6) then
-            tol=in              !tolerância
-        else if (cont==7)then
-            dt=in               !passo de tempo
-        else if(cont==8) then
-            t=in                !tempo final
-        else if (cont==9) then
-            show=nint(in)       !número de iterações para salvar arquivo para python
-        end if
-        cont=cont+1            !linha do arquivo
-    end do
+    read(input_id, *)l
+    read(input_id, *)n
+    read(input_id, *)t_i
+    read(input_id, *)t_l
+    read(input_id, *)a
+    read(input_id, *)tol
+    read(input_id, *)dt
+    read(input_id, *)t
+    read(input_id, *)show
     close(input_id)
     allocate(k(n),stat=status)
     allocate(w(n), stat=status)
@@ -41,8 +24,8 @@ subroutine ent_cond(l,n,t_i,t_l,a,tol,dt,t, k, w, phi, dx, show)
     k(1)=t_i
     dx=l/(real(n-1))
     w=k
-    phi=t_l
-    phi(1)=t_i
+    ! phi=t_l
+    ! phi(1)=t_i
 end subroutine 
 subroutine calc_cond (n,t_i,t_l,a,tol,dt,t, k, w, dx, fid, d, i, show)
 implicit none
@@ -52,7 +35,7 @@ double precision, allocatable,dimension(:)::w,k,dif
 double precision:: d,x,dx, tol, t, dt, a, t_l, t_i
 character*2048::file, name,out
     out='../output/'
-    write(file,'(I5)') cont !tranforma cont em character
+    write(file,'(I0.8)') cont !tranforma cont em character
     name=trim(out)//trim(adjustl(file))//'.dat' !cria o nome do arquivo
     open(unit=22, file=Trim((name)), action='write', status='unknown', iostat=status) !abre o arquivo
     x=0.00000
@@ -75,8 +58,8 @@ character*2048::file, name,out
         d=(sum(dif))/n !soma dos elementos do vetor diferença
         k=w ! k igual w diz que na próxima entrada os valores de k serão iguais os valores calculados para w nessa saída
         write(fid,*)w
-        if(mod(cont,show)==0 .or. abs(d)<tol .or. cont==1)then !se o resto da divisão de cont/show for exata, se a diferença entre linhas for menor que a tolerância estabecida & o primeiro calculo
-            write(file,'(I64)') cont
+        if(mod(cont,show)==0 .or. abs(d)<tol)then !se o resto da divisão de cont/show for exata, se a diferença entre linhas for menor que a tolerância estabecida & o primeiro calculo
+            write(file,'(I0.8)') cont
             name=trim(out)//trim(adjustl(file))//'.dat'
             open(unit=22, file=(name), action='write', status='unknown', iostat=status)
             x=0.00000
@@ -96,20 +79,20 @@ character*2048::file, name,out
         t=t+dt
     end do
 end subroutine
-function analitico (x,dx, n, t_i, t_l, a, l)  result(phi)
+function analitico (dx, n, t_i, t_l, a, l)  result(phi)
     integer::n, j, status=0
     double precision:: x
     double precision, intent(in):: t_i, t_l, a, l, dx
     double precision, allocatable,dimension(:):: phi
+    x=dx
     allocate(phi(n), stat=status)
-    j=1
+    j=2
     phi=t_l
     phi(1)=t_i
-    do while (j-1/=n)
+    do while (j/=n)
         phi(j)=a*((((t_l-t_i)/l)*x)+t_i)
         j=j+1
         x=x+dx
     end do
-    write(*,*) phi
 end function
 end module conducao
