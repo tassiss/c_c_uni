@@ -8,32 +8,31 @@ subroutine ent_cond(l,n,t_i,t_l,a,tol,dt,t, k, w, dx, show)
     double precision, allocatable, dimension(:):: k, w
         double precision:: l, t_i, t_l, t, dt, dx, tol, a
     open(unit=input_id, action='read', status='old', iostat=status, file='../input.dat')!chamada dos dados de entrada
-    read(input_id, *)l
-    read(input_id, *)n
-    read(input_id, *)t_i
-    read(input_id, *)t_l
-    read(input_id, *)a
-    read(input_id, *)tol
-    read(input_id, *)dt
-    read(input_id, *)t
-    read(input_id, *)show
-    close(input_id)
-    allocate(k(n),stat=status)
-    allocate(w(n), stat=status)
-    k=t_l
-    k(1)=t_i
-    dx=l/(real(n-1))
+    read(input_id, *)l !lê cada linha do arquivo e associa com uma variavel de entrada
+    read(input_id, *)n  !
+    read(input_id, *)t_i    !
+    read(input_id, *)t_l    !
+    read(input_id, *)a  !
+    read(input_id, *)tol    !
+    read(input_id, *)dt !
+    read(input_id, *)t  !
+    read(input_id, *)show   !
+    close(input_id) !fecha o arquivo para economizar memória
+    allocate(k(n),stat=status) !aloca o vetor k utilizado para calcular a temperatura
+    allocate(w(n), stat=status) !aloca o vetor w que é o vetor temperatura
+    k=t_l !todos os pontos do vetor são equivalente a t_l
+    k(1)=t_i ! o primeiro nó recebe a temperatura t_i
+    dx=l/(real(n-1)) !distância entre o nós
     w=k
-    ! phi=t_l
-    ! phi(1)=t_i
 end subroutine 
 subroutine calc_cond (n,t_i,t_l,a,tol,dt,t, k, w, dx, fid, d, i, show)
 implicit none
 integer::n, fid,i, show, j=1, status=0, cont=1
-!integer*16:: cont=1
 double precision, allocatable,dimension(:)::w,k,dif
 double precision:: d,x,dx, tol, t, dt, a, t_l, t_i
 character*2048::file, name,out
+    !########################################################################################
+    !método para criação de arquivo output
     out='../output/'
     write(file,'(I0.8)') cont !tranforma cont em character
     name=trim(out)//trim(adjustl(file))//'.dat' !cria o nome do arquivo
@@ -48,6 +47,8 @@ character*2048::file, name,out
     end do
     j=1
     close(22, iostat=status)
+    !fim
+    !#########################################################################################
     do
         do while(i/=n) !enquanto i for menor que n:
             w(i)=((dt*a*(k(i+1)-(2*(k(i)))+k(i-1)))/dx**2)+k(i) ! o vetor w é igua a isso tudo que envolve o vetor k
