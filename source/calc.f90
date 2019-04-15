@@ -2,14 +2,14 @@ program cond
     use in_out
     implicit none      
     integer::i=2, n, status=0, show, cont=1 !i=posição no vetor, n=número de nós
-    double precision:: a,dt,dx, d, tol, l, t_i, t_f, t, x
+    double precision:: a,dt,dx, d, tol, l, t_i, t_l, t, x
     double precision, allocatable, dimension(:)::w, k, dif !w é o vetor temperatura na barra, k é um vetor utilizado para calcular w
     allocate(k(n),stat=status) !aloca o vetor k utilizado para calcular a temperatura
     allocate(w(n), stat=status) !aloca o vetor w que é o vetor temperatura
     allocate(dif(n), stat=status)
-    call entrada(n,show,l,t_i,t_f,a,tol,dt,t,dx)
-    w(n)=t_f
-    w(1)=t_i
+    call entrada(n,show,l,t_i,t_l,a,tol,dt,t,dx)
+    w=t_l
+    !w(1)=t_i
     k=w
     call saida(t,x,w, cont)
     do
