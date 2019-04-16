@@ -2,7 +2,7 @@ module in_out
     implicit none
     contains
     !#############################################################################################
-    subroutine entrada (n,show,l,t_i,t_l,a,tol,dt,t,dx)
+    subroutine entrada (n,show,l,t_i,t_l,a,tol,dt,dx)
         implicit none
         integer::n, show, input_id=22, status=0
         double precision:: l, t_i,t_l,a, tol, dt, t, dx
@@ -22,20 +22,21 @@ module in_out
     !################################################################################################
     subroutine saida(t,x,w,cont)
         implicit none
-        integer::status=0, cont, j,  fid=20,n, show
-        double precision::x,t,t_l,t_i, dx, a, tol, dt, l
+        integer::status=0, cont, j=1,  fid=20,n, show
+        double precision::x,t_l,t_i, dx, a, tol, dt, l
+        double precision, intent(in)::t
         double precision,dimension(:)::w
         character*2048::out,name,file
-        call entrada(n,show,l,t_i,t_l,a,tol,dt,t,dx)
+        call entrada(n,show,l,t_i,t_l,a,tol,dt,dx)
         out='../output/'
         write(file,'(I0.8)') cont !tranforma cont em character
         name=trim(out)//trim(adjustl(file))//'.dat' !cria o nome do arquivo
         open(unit=fid, file=Trim((name)), action='write', status='unknown', iostat=status) !abre o arquivo
         x=0.00000
-        do while (j+1/=n)!varre todo o vetor, inclusive as pontas
+        do while (j-1/=n)!varre todo o vetor, inclusive as pontas
             write(fid,*)t, x, w(j) !escreve tempo, posição do nó e sua respectiva temperatura
-           ! w(j)=t_l
-           ! w(1)=t_i
+            w(n)=t_l
+            w(1)=t_i
             j=j+1
             x=x+dx
         end do

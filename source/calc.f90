@@ -2,14 +2,14 @@ program cond
     use in_out
     implicit none      
     integer::i=2, n, status=0, show, cont=1 !i=posição no vetor, n=número de nós
-    double precision:: a,dt,dx, d, tol, l, t_i, t_l, t, x
+    double precision:: a,dt,dx, d, tol, l, t_i, t_l, t=0.000, x
     double precision, allocatable, dimension(:)::w, k, dif !w é o vetor temperatura na barra, k é um vetor utilizado para calcular w
+    call entrada(n,show,l,t_i,t_l,a,tol,dt,dx)
     allocate(k(n),stat=status) !aloca o vetor k utilizado para calcular a temperatura
     allocate(w(n), stat=status) !aloca o vetor w que é o vetor temperatura
     allocate(dif(n), stat=status)
-    call entrada(n,show,l,t_i,t_l,a,tol,dt,t,dx)
     w=t_l
-    !w(1)=t_i
+    w(1)=t_i
     k=w
     call saida(t,x,w, cont)
     do
@@ -18,16 +18,18 @@ program cond
             i=i+1
         end do
         i=2
-
         dif=w-k !vetor diferença entre os loops do calculo
         d=sum(dif)/n !d é média entre as diferenças entre os vetores w e k
         k=w !! k igual w diz que na próxima entrada os valores de k serão iguais os valores calculados para w nessa saída
         t=t+dt
-        call saida(t,x,w, cont)
-        if(abs(d)<=tol) then !se a diferença entre os vetores for menor ou igual a tlerância estabelcida
-            exit !o calculo para
-        end if
         cont=cont+1
+        if(mod(cont,show)==0 .or. abs(d)<=tol) then
+            call saida(t,x,w, cont)
+        end if    
+        if(abs(d)<=tol) then !se a diferença entre os vetores for menor ou igual a tlerância estabelcida
+            write(*,*) t
+            exit !o calculo para
+        end if       
     end do
     deallocate(w,stat=status)
     deallocate(k,stat=status)

@@ -5,5 +5,5 @@
 1.0         ! difusidade térmica
 1.0E-14     !tolerância 
 0.001      !passo de tempo
-3.0         !tempo de simulação
+0.0         !tempo de simulação !aqui zero, pois no momento ele é utilizado para contar a "demora" para estabilizar o sistema
 500	    !passos para print
