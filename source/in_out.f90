@@ -43,4 +43,10 @@ module in_out
         j=1
         close(fid, iostat=status)
     end subroutine saida
+
+    function analitico (t_i, t_l,a, l, x) result(phi)
+        implicit none
+        double precision::t_i, t_l, a, l, phi, x
+        phi=a*((((t_l-t_i)/l)*x)+t_i)
+    end function
 end module in_out
