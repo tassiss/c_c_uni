@@ -9,8 +9,8 @@ output:
 test: all
 	valgrind --leak-check=full --show-reachable=yes --track-origins=yes ./cond
 clean:
-	rm -rf  cond *.o* *.mod
+	rm -rf  cond *.*
 python:
-	python out.py
+	cd ../source/ && python out.py
 gif: python
 	cd ../output/ && convert -delay 20 -loop 0 *.png ../out.gif
