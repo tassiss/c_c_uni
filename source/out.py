@@ -12,4 +12,5 @@ for i in range (0,l):
 	plt.ylabel('temperatura')
 	plt.plot(x,temp)
 	plt.savefig('../output/'+str(t[0])+'.png')	
+	plt.close()	
 	i=i+1
