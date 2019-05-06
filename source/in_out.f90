@@ -9,7 +9,7 @@ module in_out
         open(unit=input_id, action='read', status='old', iostat=status, file='../input.dat')!chamada dos dados de entrada
         read(input_id, *)l !lê cada linha do arquivo e associa com uma variavel de entrada
         read(input_id, *)n  !
-        read(input_id, *)t_i    !
+        read(input_id, *)t_i    
         read(input_id, *)t_l    !
         read(input_id, *)a  !
         read(input_id, *)tol    !

@@ -35,7 +35,7 @@ program cond
         g_c(i)=dirichlet(t_i, t_l,w,i, n)
 
     end do
-    !#########################################
+    !########################################
     do
     !#####CÁLCULO DA DIFUSIVIDADE###########
         do i=1-n_g,n+n_g

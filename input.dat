@@ -1,9 +1,10 @@
-2.0         !tamanho da barra
-10          !número de nós na barra
+20      !tamanho da barra
+1000       !número de nós na barra
 200.0       !temperatura inserida no inicio da barra
-100.0       ! temperatura no restante da barra
+0.0       ! temperatura inicial
 1.0         ! difusidade térmica
-1.0E-14     !tolerância 
-0.001      !passo de tempo
-0.0         !tempo de simulação !aqui zero, pois no momento ele é utilizado para contar a "demora" para estabilizar o sistema
-500	    !passos para print
+1.0E-8    !tolerância 
+0.5	!cfl
+2000.0         !tempo de simulação 
+10000   !passos para print
+2	!número de celulas fantasmas (em um dos lados)
