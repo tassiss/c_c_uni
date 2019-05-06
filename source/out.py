@@ -6,7 +6,7 @@ f.sort()
 l=len(f)
 for i in range (0,l):
 	data=np.loadtxt(f[i])
-	t,x,temp=zip(*data)
+	t,x,temp, cont, erro=zip(*data)
 	plt.title('t: '+str(t[0]))
 	plt.xlabel('Posicao do ponto')
 	plt.ylabel('temperatura')
