@@ -11,17 +11,17 @@ module functions
         double precision::d_k, x, t
         d_k=1.0+0*t+0*x
     end function dif_ter
-    function dirichlet(t_i, t_l, w, i,n) result (g_c)
+    subroutine dirichlet(n_g, w, k, t_i, t_l,n)
         implicit none
-        double precision:: g_c, t_i, t_l
-        integer:: i,n
-        double precision, allocatable, dimension(:)::w
-        if (i<n) then
-            g_c=2*t_i-w(1-i)
-        end if
-        if (i>=n) then
-            g_c=2*t_l-w(-i+2*n+1)
-        end if
-    end function
-end module functions
-!
+        double precision:: t_i, t_l
+        integer::i, n_g, n
+        double precision, allocatable, dimension(:)::w, k
+        do i=1-n_g,0
+            w(i)=(2*t_i)-k((-i)+1)
+        end do
+        
+        do i=n+1, n+n_g
+            w(i)=(2*t_l)-k((-i)+(2*n))
+        end do
+    end subroutine 
+end module

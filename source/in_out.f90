@@ -22,9 +22,10 @@ module in_out
         dt=cfl*(dx**2/a**2)
     end subroutine entrada
     !################################################################################################
-    subroutine saida(t,dt,x,w,cont, erro)
+    subroutine saida(t,dt,x,w,cont, erro, n_g)
         implicit none
-        integer::status=0, cont, j=1,  fid=20,n, show, n_g
+        integer, intent(in)::n_g
+        integer::status=0, cont, j,  fid=20,n, show
         double precision::x,t_l,t_i, dx, a, tol, dt, l, time
         double precision, intent(in)::t, erro
         double precision,dimension(:)::w
@@ -35,14 +36,12 @@ module in_out
         name=trim(out)//trim(adjustl(file))//'.dat' !cria o nome do arquivo
         open(unit=fid, file=Trim((name)), action='write', status='unknown', iostat=status) !abre o arquivo
         x=0.00000
-        do while (j-1/=n)!varre todo o vetor, inclusive as pontas
+        j=n_g+1
+        do while (j<=n+n_g)!varre todo o vetor, inclusive as pontas
             write(fid,*)t, x, w(j), cont, erro !escreve tempo, posição do nó e sua respectiva temperatura
-            w(n)=t_l
-            w(1)=t_i
             j=j+1
             x=x+dx
         end do
-        j=1
         close(fid, iostat=status)
     end subroutine saida
 
