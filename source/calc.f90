@@ -24,6 +24,7 @@ program cond
         r_a(i)=analitico(t_i, t_l,a, l, x)
         x=(i)*dx
     end do
+    
     !#######################################
 
     do

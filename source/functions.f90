@@ -23,5 +23,6 @@ module functions
         do i=n+1, n+n_g
             w(i)=(2*t_l)-k((-i)+(2*n))
         end do
+   
     end subroutine 
 end module

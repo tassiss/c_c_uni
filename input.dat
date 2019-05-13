@@ -1,5 +1,5 @@
 20      !tamanho da barra
-1000       !número de nós na barra
+10000      !número de nós na barra
 200.0       !temperatura inserida no inicio da barra
 0.0       ! temperatura inicial
 1.0         ! difusidade térmica

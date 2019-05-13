@@ -32,6 +32,7 @@ module in_out
         character*2048::out,name,file
         call entrada(n,show,l,t_i,t_l,a,tol,dt,dx,time, n_g)
         out='../output/'
+        call system ('mkdir '//out)
         write(file,'(I0.10)') cont !tranforma cont em character
         name=trim(out)//trim(adjustl(file))//'.dat' !cria o nome do arquivo
         open(unit=fid, file=Trim((name)), action='write', status='unknown', iostat=status) !abre o arquivo
