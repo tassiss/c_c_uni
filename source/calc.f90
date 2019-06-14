@@ -3,20 +3,45 @@ program cond
     use functions
     implicit none      
     integer::i=2, n, status=0, show, cont=1, n_g !i=posição no vetor, n=número de nós
-    double precision:: a,dt,dx, d, tol, l, t_i, t_l, t=0.000, x, erro=0, rm, time, rho, cp, dkp, dkn
+    double precision:: a,dt,dx, d, tol, l, t_i, t_l, t=0.0d0, x, erro=0, rm, time, rho, cp, dkp, dkn
     double precision, allocatable, dimension(:)::w, k, dif, r_a, e_m,d_k !r_a é "resultado analitico" !w é o vetor temperatura na barra, k é um vetor utilizado para calcular w
     call entrada(n,show,l,t_i,t_l,a,tol,dt,dx, time, n_g)
     allocate(d_k(1-n_g:n+n_g), stat=status)
+    if (status/=0) then
+        write(*,*) 'erro de alocação d_k'
+        stop
+    end if
     allocate(k(1-n_g:n+n_g),stat=status) !aloca o vetor k utilizado para calcular a temperatura
+    if (status/=0) then
+        write(*,*) 'erro de alocação k'
+        stop
+    end if
     allocate(w(1-n_g:n+n_g), stat=status) !aloca o vetor w que é o vetor temperatura
+    if (status/=0) then
+        write(*,*) 'erro de alocação w'
+        stop
+    end if
     allocate(dif(n), stat=status)
+    if (status/=0) then
+        write(*,*) 'erro de alocação dif'
+        stop
+    end if
     allocate(r_a(n), stat=status)
+    if (status/=0) then
+        write(*,*) 'erro de alocação r_a'
+        stop
+    end if
+    
     allocate(e_m(n), stat=status)
+    if (status/=0) then
+        write(*,*) 'erro de alocação e_m'
+        stop
+    end if
     w(1:n)=t_l
     call dirichlet(n_g, w, k, t_i, t_l, n)
     k=w
-    rho=1.0
-    cp=1.0
+    rho=1.0d0
+    cp=1.0d0
     call saida(t,dt,x,w, cont, erro, n_g)
     r_a=w(1:n)
     !######CÁLCULO DO MÉTODO ANALITICO#######
@@ -24,7 +49,7 @@ program cond
         r_a(i)=analitico(t_i, t_l,a, l, x)
         x=(i)*dx
     end do
-    
+
     !#######################################
 
     do
@@ -39,9 +64,9 @@ program cond
 
     !#####CÁLCULO DO MÉTODO NUMÉRICO########   
         do i=1,n !a temperatura nas pontas da barra variam
-            dkp=(d_k(i)+d_k(i+1))/2.0
-            dkn=(d_k(i-1)+d_k(i))/2.0
-            w(i)= (((dt/(4*(dx**2)))*((dkp*(k(i+1)-k(i)))-(dkn*(k(i)-k(i-1)))))+k(i))/(rho*cp)!equação da tempratura na barra
+            dkp=(d_k(i)+d_k(i+1))/2.0d0
+            dkn=(d_k(i-1)+d_k(i))/2.0d0
+            w(i)= (((dt/(4.0d0*(dx**2.0d0)))*((dkp*(k(i+1)-k(i)))-(dkn*(k(i)-k(i-1)))))+k(i))/(rho*cp)!equação da tempratura na barra
         end do
     !#######################################
         dif=w-k !vetor diferença entre os loops do calculo
@@ -67,9 +92,34 @@ program cond
         d=erro
     end do
     deallocate(w,stat=status)
+    if (status/=0) then
+        write(*,*) 'erro de dealoção'
+        stop 
+    end if
     deallocate(k,stat=status)
+    if (status/=0) then
+        write(*,*) 'erro de dealoção'
+        stop 
+    end if
     deallocate(dif,stat=status)
+    if (status/=0) then
+        write(*,*) 'erro de dealoção'
+        stop 
+    end if
+    
     deallocate (r_a, stat=status)
+    if (status/=0) then
+        write(*,*) 'erro de dealoção'
+        stop 
+    end if
     deallocate(e_m, stat=status)
+    if (status/=0) then
+        write(*,*) 'erro de dealoção'
+        stop 
+    end if
     deallocate(d_k,stat=status)
-    end program
+    if (status/=0) then
+        write(*,*) 'erro de dealoção'
+        stop 
+    end if    
+end program

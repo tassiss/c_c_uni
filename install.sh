@@ -7,7 +7,7 @@ sudo apt-get install gfortran
 
 sudo apt-get install python3
 sudo apt-get install python-pip
-sudo pip install numpy
+sudo pip install numpy matplotlib
 
 #install gif creator
 

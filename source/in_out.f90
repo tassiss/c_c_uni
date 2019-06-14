@@ -19,7 +19,8 @@ module in_out
         read(input_id,*) n_g
         close(input_id)
         dx=l/(real(n-1)) !distância entre o nós
-        dt=cfl*(dx**2/a**2)
+        dt=cfl*(dx**2/a)
+        write(*,*) dx, dt 
     end subroutine entrada
     !################################################################################################
     subroutine saida(t,dt,x,w,cont, erro, n_g)
@@ -32,11 +33,13 @@ module in_out
         character*2048::out,name,file
         call entrada(n,show,l,t_i,t_l,a,tol,dt,dx,time, n_g)
         out='../output/'
+        
         call system ('mkdir '//out)
+        
         write(file,'(I0.10)') cont !tranforma cont em character
         name=trim(out)//trim(adjustl(file))//'.dat' !cria o nome do arquivo
         open(unit=fid, file=Trim((name)), action='write', status='unknown', iostat=status) !abre o arquivo
-        x=0.00000
+        x=0.0d0
         j=n_g+1
         do while (j<=n+n_g)!varre todo o vetor, inclusive as pontas
             write(fid,*)t, x, w(j), cont, erro !escreve tempo, posição do nó e sua respectiva temperatura
