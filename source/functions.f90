@@ -1,15 +1,15 @@
 module functions
     implicit none
     contains
-    function analitico (t_i, t_l,a, l, x) result(phi)
+    function analitico (t_i, t_l, l, x) result(phi)
         implicit none
-        double precision::t_i, t_l, a, l, phi, x
-        phi=a*((((t_l-t_i)/l)*x)+t_i)
+        double precision::t_i, t_l, l, phi, x
+        phi=((((t_l-t_i)/l)*x)+t_i)
     end function analitico
-    function dif_ter(x,t) result(d_k)
+    function dif_ter(x,t,a) result(d_k)
         implicit none
-        double precision::d_k, x, t
-        d_k=1.0+0*t+0*x
+        double precision::d_k, x, t, a
+        d_k=a+0*t+0*x
     end function dif_ter
     subroutine dirichlet(n_g, w, k, t_i, t_l,n)
         implicit none

@@ -1,11 +1,20 @@
 program cond
     use in_out
     use functions
+    use lapack_parcer
     implicit none      
-    integer::i=2, n, status=0, show, cont=1, n_g !i=posição no vetor, n=número de nós
-    double precision:: a,dt,dx, d, tol, l, t_i, t_l, t=0.0d0, x, erro=0, rm, time, rho, cp, dkp, dkn
+    integer::i=2, n, status=0, show, cont=1, n_g!i=posição no vetor, n=número de nós
+    double precision:: a,dt,dx, d, tol, l, t_i, t_l, t=0.0d0, x, erro=0, rm, time, rho, cp, dkp, dkn, z
     double precision, allocatable, dimension(:)::w, k, dif, r_a, e_m,d_k !r_a é "resultado analitico" !w é o vetor temperatura na barra, k é um vetor utilizado para calcular w
-    call entrada(n,show,l,t_i,t_l,a,tol,dt,dx, time, n_g)
+    double precision, allocatable, dimension(:,:):: m !matriz 'A'
+
+    call entrada(n,show,l,t_i,t_l,a,tol,dt,dx, time, n_g, rho, cp)
+    allocate(m(1-n_g:n+n_g,1-n_g:n+n_g), stat=status)
+    if (status/=0) then
+        write(*,*) 'erro de alocação m'
+        stop
+    end if
+    write(8,*) m
     allocate(d_k(1-n_g:n+n_g), stat=status)
     if (status/=0) then
         write(*,*) 'erro de alocação d_k'
@@ -40,34 +49,52 @@ program cond
     w(1:n)=t_l
     call dirichlet(n_g, w, k, t_i, t_l, n)
     k=w
-    rho=1.0d0
-    cp=1.0d0
+    
     call saida(t,dt,x,w, cont, erro, n_g)
     r_a=w(1:n)
     !######CÁLCULO DO MÉTODO ANALITICO#######
-    do i=2,(n-1)
-        r_a(i)=analitico(t_i, t_l,a, l, x)
-        x=(i)*dx
+    do i=1,n
+        x=dx/2.d0 +(i-1)*dx
+        r_a(i)=analitico(t_i, t_l, l, x)
     end do
-
     !#######################################
-
+    
+    
+    m= 0.0d0
+    
+    
     do
     !#####CÁLCULO DA DIFUSIVIDADE###########
         do i=1-n_g,n+n_g
-            d_k(i)=dif_ter(x,t)
-            x=(i-1)*dx
+            x=dx/2.d0 +(i-1)*dx
+            d_k(i)=dif_ter(x,t,a)
         end do
 
     !#######################################
         
 
     !#####CÁLCULO DO MÉTODO NUMÉRICO########   
-        do i=1,n !a temperatura nas pontas da barra variam
-            dkp=(d_k(i)+d_k(i+1))/2.0d0
-            dkn=(d_k(i-1)+d_k(i))/2.0d0
-            w(i)= (((dt/(4.0d0*(dx**2.0d0)))*((dkp*(k(i+1)-k(i)))-(dkn*(k(i)-k(i-1)))))+k(i))/(rho*cp)!equação da tempratura na barra
+        do i=1-n_g,n+n_g !a temperatura nas pontas da barra variam
+            if (i>=1 .and. i<=n) then
+                dkp=(d_k(i)+d_k(i+1))/2.0d0
+                dkn=(d_k(i-1)+d_k(i))/2.0d0
+            end if
+            if(i<1 .or. i>n)then
+                 m(i,i)=1.0d0
+            else
+                z=(dt/((dx**2.0d0)*rho*cp))
+                m(i,i)=(z*(dkp+dkn))+1
+                m(i,i+1)=-z*dkp
+                m(i,i-1)=-z*dkn
+            end if
+            write(9,*) m(i,:)
         end do
+        
+        call lapack_lin_sys(n+(2*n_g),m,k,w)
+        if (all(k==w)) then
+            write(*,*)'Erro'
+            stop
+        end if
     !#######################################
         dif=w-k !vetor diferença entre os loops do calculo
         e_m=w(1:n)-r_a !vetor diferença em relação ao analitico
@@ -76,7 +103,7 @@ program cond
         t=t+dt
         cont=cont+1
         write(*,*) 'erro ao analitico', rm
-        write(*,*) 'erro', erro
+        write(*,*) 'diferença', erro
         write(*,*) 'tempo[s]:      ', t
         if(mod(cont,show)==0)then
             call saida(t,dt,x,w,cont, erro, n_g)
@@ -87,39 +114,44 @@ program cond
             write(*,*) t
             exit !o calculo para
         end if 
-        k=w
         call dirichlet(n_g, w, k, t_i, t_l, n)
+        k=w
         d=erro
-    end do
+    end do 
     deallocate(w,stat=status)
     if (status/=0) then
-        write(*,*) 'erro de dealoção'
+        write(*,*) 'erro de dealocação'
         stop 
     end if
     deallocate(k,stat=status)
     if (status/=0) then
-        write(*,*) 'erro de dealoção'
+        write(*,*) 'erro de dealocação'
         stop 
     end if
     deallocate(dif,stat=status)
     if (status/=0) then
-        write(*,*) 'erro de dealoção'
+        write(*,*) 'erro de dealocação'
         stop 
     end if
     
     deallocate (r_a, stat=status)
     if (status/=0) then
-        write(*,*) 'erro de dealoção'
+        write(*,*) 'erro de dealocação'
         stop 
     end if
     deallocate(e_m, stat=status)
     if (status/=0) then
-        write(*,*) 'erro de dealoção'
+        write(*,*) 'erro de dealocação'
         stop 
     end if
     deallocate(d_k,stat=status)
     if (status/=0) then
-        write(*,*) 'erro de dealoção'
+        write(*,*) 'erro de dealocação'
         stop 
     end if    
+    deallocate(m,stat=status)
+    if (status/=0) then
+        write(*,*) 'erro de dealocação'
+        stop 
+    end if
 end program

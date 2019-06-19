@@ -2,24 +2,26 @@ module in_out
     implicit none
     contains
     !#############################################################################################
-    subroutine entrada (n,show,l,t_i,t_l,a,tol,dt,dx, time, n_g)
+    subroutine entrada (n,show,l,t_i,t_l,a,tol,dt,dx, time, n_g, rho, cp)
         implicit none
         integer::n, show, input_id=22, status=0, n_g
-        double precision:: l, t_i,t_l,a, tol, dt, dx, time, cfl
+        double precision:: l, t_i,t_l,a, tol, dt, dx, time, cfl, rho, cp
         open(unit=input_id, action='read', status='old', iostat=status, file='../input.dat')!chamada dos dados de entrada
         read(input_id, *)l !lê cada linha do arquivo e associa com uma variavel de entrada
         read(input_id, *)n  !
         read(input_id, *)t_i    
         read(input_id, *)t_l    !
-        read(input_id, *)a  !
+        read(input_id, *)a  ! difusividade térmica
         read(input_id, *)tol    !
         read(input_id, *)cfl !
         read(input_id, *)time  !
         read(input_id, *)show   !
         read(input_id,*) n_g
+        read(input_id,*) rho
+        read(input_id,*) cp
         close(input_id)
         dx=l/(real(n-1)) !distância entre o nós
-        dt=cfl*(dx**2/a)
+        dt=cfl*(dx**2/(a/(rho*cp)))
         write(*,*) dx, dt 
     end subroutine entrada
     !################################################################################################
@@ -27,11 +29,11 @@ module in_out
         implicit none
         integer, intent(in)::n_g
         integer::status=0, cont, j,  fid=20,n, show
-        double precision::x,t_l,t_i, dx, a, tol, dt, l, time
+        double precision::x,t_l,t_i, dx, a, tol, dt, l, time, rho, cp
         double precision, intent(in)::t, erro
         double precision,dimension(:)::w
         character*2048::out,name,file
-        call entrada(n,show,l,t_i,t_l,a,tol,dt,dx,time, n_g)
+        call entrada(n,show,l,t_i,t_l,a,tol,dt,dx,time, n_g, rho, cp)
         out='../output/'
         
         call system ('mkdir '//out)
