@@ -2,16 +2,16 @@ module in_out
     implicit none
     contains
     !#############################################################################################
-    subroutine entrada (n,show,l,t_i,t_l,a,tol,dt,dx, time, n_g, rho, cp)
+    subroutine entrada (n,show,l,t_i,t_l,k,tol,dt,dx, time, n_g, rho, cp, i_e)
         implicit none
-        integer::n, show, input_id=22, status=0, n_g
-        double precision:: l, t_i,t_l,a, tol, dt, dx, time, cfl, rho, cp
+        integer::n, show, input_id=22, status=0, n_g, i_e
+        double precision:: l, t_i,t_l,k, tol, dt, dx, time, cfl, rho, cp
         open(unit=input_id, action='read', status='old', iostat=status, file='../input.dat')!chamada dos dados de entrada
         read(input_id, *)l !lê cada linha do arquivo e associa com uma variavel de entrada
         read(input_id, *)n  !
         read(input_id, *)t_i    
         read(input_id, *)t_l    !
-        read(input_id, *)a  ! difusividade térmica
+        read(input_id, *)k  ! difusividade térmica
         read(input_id, *)tol    !
         read(input_id, *)cfl !
         read(input_id, *)time  !
@@ -19,21 +19,22 @@ module in_out
         read(input_id,*) n_g
         read(input_id,*) rho
         read(input_id,*) cp
+        read(input_id,*) i_e
         close(input_id)
         dx=l/(real(n-1)) !distância entre o nós
-        dt=cfl*(dx**2/(a/(rho*cp)))
+        dt=cfl*(dx**2/(k/(rho*cp)))
         write(*,*) dx, dt 
     end subroutine entrada
     !################################################################################################
     subroutine saida(t,dt,x,w,cont, erro, n_g)
         implicit none
         integer, intent(in)::n_g
-        integer::status=0, cont, j,  fid=20,n, show
-        double precision::x,t_l,t_i, dx, a, tol, dt, l, time, rho, cp
+        integer::status=0, cont, j,  fid=20,n, show, i_e
+        double precision::x,t_l,t_i, dx, k, tol, dt, l, time, rho, cp
         double precision, intent(in)::t, erro
         double precision,dimension(:)::w
         character*2048::out,name,file
-        call entrada(n,show,l,t_i,t_l,a,tol,dt,dx,time, n_g, rho, cp)
+        call entrada(n,show,l,t_i,t_l,k,tol,dt,dx,time, n_g, rho, cp, i_e)
         out='../output/'
         
         call system ('mkdir '//out)

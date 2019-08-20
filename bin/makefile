@@ -1,17 +1,13 @@
-all:functions.o in_out.o calc.o lapack_parcer.o
+all:functions.o in_out.o calc.o gauss-seidel.o
 	gfortran -o cond *.o
-calc.o: ../source/calc.f90 lapack_parcer.o
+calc.o: ../source/calc.f90 gauss-seidel.o
 	gfortran -c -Wall -Werror -fcheck=all ../source/calc.f90
 in_out.o: ../source/in_out.f90
 	gfortran -c -Wall -Werror -fcheck=all ../source/in_out.f90
 functions.o: ../source/functions.f90
 	gfortran -c -Wall -Werror -fcheck=all ../source/functions.f90
-lapack_tools.o: ../source/pacotes/lapack_tools.f
-	gfortran -c -Wall -fcheck=all ../source/pacotes/lapack_tools.f
-lapack.o: ../source/pacotes/lapack.f lapack_tools.o
-	gfortran -c -Wall -fcheck=all ../source/pacotes/lapack.f
-lapack_parcer.o: ../source/pacotes/lapack_parcer.f08 lapack.o
-	gfortran -c -Wall -Werror -fcheck=all ../source/pacotes/lapack_parcer.f08
+gauss-seidel.o: ../source/gauss-seidel.f90
+	gfortran -c -Wall -Werror -fcheck=all ../source/gauss-seidel.f90
 output: 
 	mkdir ../output
 test: all
