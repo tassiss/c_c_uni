@@ -25,14 +25,30 @@ module functions
         end do
    
     end subroutine 
-    subroutine g_s (n,a,b,c, w, z)
+    subroutine g_s (n,a,b,c, w, z, n_g, tol, n_i)
         implicit none
-        integer:: n, i !número de elementos, contador
-        double precision:: a,b,c !constantes embutidos na matriz
+        integer:: n, i,j, n_g, n_i !número de elementos, contador
+        double precision:: a,b,c, m_n1, m_n2, tol!constantes embutidos na matriz !m_n será o maior número obtido na iteraçao
         double precision, allocatable, dimension (:):: w, z !vetores de calculo
-        write(*,*) n, size(z), size(w)
-        do i=2,n-1
-            w(i)=(1.0d0/b)*(z(i)-(a*w(i-1)+c*z(i+1)))
+        !write(*,*) n, size(z), size(w)
+        w(1-n_g:0)=z(1-n_g:0)               !celulas ghosts
+        w((n+1)-(2*n_g):n-n_g)=z((n+1)-(2*n_g):n-n_g)   !células ghosts
+        m_n2=1
+        m_n1=0
+        write(*,*) '       iteracao              ','tol'
+        j=1
+        do while (abs(m_n2-m_n1)>tol)
+            m_n2=m_n1
+            do i=1,n-(2*n_g)
+                w(i)=(1.0d0/b)*(z(i)-(a*w(i-1)+c*w(i+1)))   
+            end do
+            m_n1=maxval(abs(w(1:n-2*n_g)))
+            write(*,*)j, '       ',abs(m_n2-m_n1)
+            j=j+1
+            if(j>n_i) then
+                exit
+            end if
         end do
+        
     end subroutine
 end module

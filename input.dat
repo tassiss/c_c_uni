@@ -1,13 +1,14 @@
-2.0d0      !tamanho da barra
-100      !número de nós na barra
-1000.0d0       !temperatura inserida no inicio da barra
-00.0d0       ! temperatura inicial
-81.0d0            ! condutividade térmica
-1.0E-8		 !tolerância 
-0.1d0		 !cfl
-1.0d3         !tempo de simulação 
-100   	!passos para print
-2	!número de celulas fantasmas (em um dos lados)
+2.0d0      	!tamanho da barra
+100     	!número de nós na barra
+1000.0d0       	!temperatura inserida no inicio da barra
+00.0d0       	! temperatura inicial
+81.0d0          ! condutividade térmica
+1.0E-1000		!tolerância 
+0.1d0		!cfl
+1.0d5         	!tempo de simulação 
+100   		!passos para print
+2		!número de celulas fantasmas (em um dos lados)
 7860.0d0 	!rho densidade do material1
 443.0d0 	!cp capacidade de calor do material 
-2           !1 para método implicito e 2 para explicito
+1           	!1 para método implicito e 2 para explicito
+100		! número máximo de iterações por fração de tempo
