@@ -11,17 +11,25 @@ module functions
         double precision::d_k, x, t, k
         d_k=k+0*t+0*x
     end function dif_ter
-    subroutine dirichlet(n_g, w, b, t_i, t_l,n)
+    subroutine dirichlet(n_g, w, b, t_i, t_l,n, i_e)
         implicit none
         double precision:: t_i, t_l
-        integer::i, n_g, n
+        integer::i, n_g, n, i_e
         double precision, allocatable, dimension(:)::w, b
         do i=1-n_g,0
-            w(i)=(2*t_i)-b((-i)+1)
+            if (i_e==2) then
+                w(i)=(2*t_i)-b((-i)+1)
+            else
+                w(i)=(t_i)-b((-i)+1)
+            end if
         end do
         
         do i=n+1, n+n_g
-            w(i)=(2*t_l)-b((-i)+(2*n))
+            if (i_e==2) then
+                w(i)=(2*t_l)-b((-i)+(2*n))
+            else
+                w(i)=(t_l)-b((-i)+(2*n))
+            end if
         end do
    
     end subroutine 
@@ -38,6 +46,7 @@ module functions
         write(*,*) '       iteracao              ','tol'
         j=1
         do while (abs(m_n2-m_n1)>tol)
+            
             m_n2=m_n1
             do i=1,n-(2*n_g)
                 w(i)=(1.0d0/b)*(z(i)-(a*w(i-1)+c*w(i+1)))   

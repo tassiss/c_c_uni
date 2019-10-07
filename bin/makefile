@@ -1,13 +1,12 @@
-all:functions.o in_out.o calc.o gauss-seidel.o
+all:functions.o in_out.o calc.o 
 	gfortran -o cond *.o
-calc.o: ../source/calc.f90 gauss-seidel.o
+calc.o: ../source/calc.f90 
 	gfortran -c -Wall -Werror -fcheck=all ../source/calc.f90
 in_out.o: ../source/in_out.f90
 	gfortran -c -Wall -Werror -fcheck=all ../source/in_out.f90
 functions.o: ../source/functions.f90
 	gfortran -c -Wall -Werror -fcheck=all ../source/functions.f90
-gauss-seidel.o: ../source/gauss-seidel.f90
-	gfortran -c -Wall -Werror -fcheck=all ../source/gauss-seidel.f90
+
 output: 
 	mkdir ../output
 test: all

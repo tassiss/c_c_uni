@@ -47,7 +47,7 @@ program cond
         stop
     end if
     w(1:n)=t_l
-    call dirichlet(n_g, w, b, t_i, t_l, n)
+    call dirichlet(n_g, w, b, t_i, t_l, n, i_e) 
     b=w
     
     call saida(t,dt,x,w, cont, erro, n_g)
@@ -93,7 +93,7 @@ program cond
                 end if
                 
             end do
-            call g_s (n+(2*n_g),-z*dkn,(z*(dkp+dkn))+1.0d0,-z*dkp,w,b, n_g, tol, n_i)
+            call g_s (n+(2*n_g),(-z*dkn),(z*(dkp+dkn))+1.0d0,(-z*dkp),w,b, n_g, tol, n_i)
         end if
         
         if (i_e==2)then !seleção para resolver méto explicito
@@ -130,7 +130,7 @@ program cond
             exit !o calculo para
         end if 
         b=w
-        call dirichlet(n_g, w, b, t_i, t_l, n)
+        call dirichlet(n_g, w, b, t_i, t_l, n, i_e)
         d=erro
     end do 
     deallocate(w,stat=status)
